@@ -6,6 +6,8 @@ public class ListGraph implements Graph {
     public boolean addNode(String n) {
         if (!nodes.containsKey(n)) {
             nodes.put(n, new LinkedList<String>()); // add 'n' to the graph
+            // System.out.println("add: "+nodes.toString());
+
             return true;
         } else {
             return false;
@@ -66,7 +68,11 @@ public class ListGraph implements Graph {
 
     public List<String> nodes() {
         Set<String> nodes_set = nodes.keySet();
+        // System.out.println("return nodes:");
+        // System.out.println(nodes.toString());
+
         return new ArrayList<>(nodes_set);
+
         // throw new UnsupportedOperationException();
     }
 
@@ -101,7 +107,7 @@ public class ListGraph implements Graph {
     }
 
     public Graph union(Graph g) {
-        for (String node : this.nodes()) {
+        for (String node : nodes()) {
             if (!g.hasNode(node)) {
                 // for node in listGraph: if not added, add node
                 g.addNode(node);
@@ -109,7 +115,7 @@ public class ListGraph implements Graph {
         }
 
         // add edges
-        for (String node : this.nodes()) {
+        for (String node : nodes()) {
             for (String succ_node : this.succ(node)) {
                 // for edge from node: if not added, add edge
                 if (!g.hasEdge(node, succ_node)) {
@@ -144,10 +150,10 @@ public class ListGraph implements Graph {
 
     public boolean connected(String n1, String n2) {
         // trivial
-        if(!nodes.containsKey(n1) || !nodes.containsKey(n2)){
+        if (!nodes.containsKey(n1) || !nodes.containsKey(n2)) {
             throw new NoSuchElementException();
         }
-        if (n1.equals(n2)){
+        if (n1.equals(n2)) {
             return true;
         }
         // BFS from n1 to n2
@@ -155,19 +161,19 @@ public class ListGraph implements Graph {
         pathList.add(n1);
         Iterator<String> it = pathList.iterator();
         Set<String> path = new HashSet<>(pathList);
-        while(it.hasNext()){
+        while (it.hasNext()) {
             String s = it.next();
-            for(String node: this.succ(s)){
-                if (!path.contains(node)){
+            for (String node : this.succ(s)) {
+                if (!path.contains(node)) {
                     path.add(node);
                     pathList.add(node);
-                    if(node.equals(n2)){
+                    if (node.equals(n2)) {
                         return true;
                     }
                 }
             }
         }
-        
+
         return false;
     }
 }

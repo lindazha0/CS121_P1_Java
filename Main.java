@@ -20,52 +20,103 @@ public class Main {
 		assert eg.hasEdge(e);
 	}
 
-	public static void test() {
-		Graph g1 = new ListGraph();
-		g1.addNode("a");
-		g1.addNode("b");
-		g1.addNode("c");
-		g1.addNode("d");
-		g1.addNode("e");
+	public static void graphUnitTest() {
+		// this test cover all the methods of Graph
 
-		g1.addEdge("a", "b");
-		g1.addEdge("a", "c");
-		g1.addEdge("b", "c");
-		g1.addEdge("b", "d");
-		g1.addEdge("c", "d");
-		g1.addEdge("c", "e");
-		g1.addEdge("d", "e");
-		g1.addEdge("d", "a");
-		g1.addEdge("e", "a");
-		g1.addEdge("e", "b");
+		Graph graph = new ListGraph();
 
-		Set<String> subset = new HashSet<String>(Arrays.asList("a", "c", "e"));
+		// test add function
+		assert graph.addNode("a");
+		assert graph.addNode("b");
+		assert graph.addNode("c");
+		assert graph.addNode("d");
 
-		Graph g2 = g1.subGraph(subset);
-		for (String node : subset) {
-			assert g2.hasNode(node);
-		}
-		for (String node : g2.nodes()) {
-			assert subset.contains(node);
-		}
+		assert graph.addEdge("a", "b");
+		assert graph.addEdge("b", "c");
+		assert graph.addEdge("c", "d");
+		assert graph.addEdge("d", "b");
+		// System.out.println(graph.nodes());
 
-		List<String> aSucc = g2.succ("a");
-		assert aSucc.size() == 1;
-		assert g2.hasEdge("a", "c");
 
-		List<String> cSucc = g2.succ("c");
-		assert cSucc.size() == 1;
-		assert g2.hasEdge("c", "e");
+		// test valid cases about add
+		assert graph.hasNode("a");
+		assert graph.hasNode("b");
+		assert graph.hasNode("c");
+		assert graph.hasNode("d");
 
-		List<String> eSucc = g2.succ("e");
-		assert aSucc.size() == 1;
-		assert g2.hasEdge("e", "a");
+		assert graph.hasEdge("a", "b");
+		assert graph.hasEdge("b", "c");
+		assert graph.hasEdge("c", "d");
+		assert graph.hasEdge("d", "b");
+		// System.out.println(graph.nodes());
+
+
+		List<String> nodeList = new ArrayList<String>();
+		nodeList = graph.nodes();
+		assert nodeList.contains("a");
+		assert nodeList.contains("b");
+		assert nodeList.contains("c");
+		assert nodeList.contains("d");
+
+		// test invalid case about add
+		assert !graph.hasNode("e");
+		assert !graph.hasEdge("a", "d");
+
+		// test succ & pred & connected
+		nodeList = graph.succ("b");
+		assert !nodeList.contains("a");
+		assert nodeList.contains("c");
+
+		nodeList = graph.pred("b");
+		assert nodeList.contains("a");
+		assert nodeList.contains("d");
+		assert !nodeList.contains("c");
+
+		assert graph.connected("a", "d");
+		graph.addNode("z");
+		assert !graph.connected("a", "z");
+		graph.removeNode("z");
+
+		// test remove function (valid & invalid)
+		assert graph.removeEdge("c", "d");
+		assert !graph.hasEdge("c", "d");
+
+		assert graph.removeNode("b");
+		assert !graph.hasNode("b");
+		assert !graph.hasEdge("b", "c");
+		assert !graph.hasEdge("b", "d");
+		assert !graph.hasEdge("a", "b");
+
+		// test unionGraph & subGraph
+		Graph graph2 = new ListGraph();
+		assert graph2.addNode("e");
+		assert graph2.addNode("f");
+		assert graph2.addEdge("e", "f");
+		Graph unionGraph = graph.union(graph2);
+		assert unionGraph.hasNode("a");
+		assert unionGraph.hasNode("c");
+		assert unionGraph.hasNode("d");
+		assert unionGraph.hasNode("e");
+		assert unionGraph.hasNode("f");
+		assert unionGraph.hasEdge("e", "f");
+
+		Set<String> nodes = new HashSet<String>();
+		nodes.add("a");
+		nodes.add("c");
+		graph.addEdge("a", "c");
+		graph.addEdge("c", "d");
+		Graph subGraph = graph.subGraph(nodes);
+
+		assert subGraph.hasNode("a");
+		assert subGraph.hasEdge("a", "c");
+		assert !subGraph.hasNode("d");
+
 	}
 
 	public static void main(String[] args) {
 		test1();
 		test2();
-		test();
+		graphUnitTest();
 		System.out.println("Success after all testcases!");
 	}
 
