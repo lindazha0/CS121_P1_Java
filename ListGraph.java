@@ -15,10 +15,14 @@ public class ListGraph implements Graph {
 
     public boolean addEdge(String n1, String n2) {
         if (nodes.containsKey(n1) && nodes.containsKey(n2)) {
+            if (hasEdge(n1, n2)) {
+                return false;
+            }
             nodes.get(n1).add(n2); // add edge from "n1" to "n2"
             return true;
         }
-        throw new UnsupportedOperationException();
+        throw new NoSuchElementException();
+        // throw new UnsupportedOperationException();
     }
 
     public boolean hasNode(String n) {
@@ -33,13 +37,13 @@ public class ListGraph implements Graph {
 
     public boolean removeNode(String n) {
         if (nodes.containsKey(n)) {
-            // remove n from all adjacent nodes
+            // remove edges to n from all adjacent nodes
             for (String node : nodes.keySet()) { // iterate over key of HashMap
                 if (nodes.get(node).contains(n))
                     nodes.get(node).remove(n); // get corresponding successor lists
             }
 
-            // remove the node n from the graoh
+            // remove the node n from the graph (and all edged from n)
             nodes.remove(n);
             return true;
         } else {
@@ -49,13 +53,15 @@ public class ListGraph implements Graph {
     }
 
     public boolean removeEdge(String n1, String n2) {
-        if (this.hasEdge(n1, n2)) {
+        if (!nodes.containsKey(n1) || !nodes.containsKey(n2)) {
+            throw new NoSuchElementException();
+        }
+        if (hasEdge(n1, n2)) {
             nodes.get(n1).remove(n2);
             return true;
         } else {
             return false;
         }
-        // throw new UnsupportedOperationException();
     }
 
     public List<String> nodes() {
@@ -66,11 +72,12 @@ public class ListGraph implements Graph {
 
     public List<String> succ(String n) {
         if (!nodes.containsKey(n)) {
-            throw new UnsupportedOperationException();
+            throw new NoSuchElementException();
+            // throw new UnsupportedOperationException();
         }
         List<String> succ_list = new ArrayList<>();
         for (String node : nodes.keySet()) { // iterate over key of HashMap
-            if (this.hasEdge(n, node)){
+            if (nodes.get(n).contains(node)) {
                 // get corresponding pred lists
                 succ_list.add(node);
             }
@@ -80,11 +87,12 @@ public class ListGraph implements Graph {
 
     public List<String> pred(String n) {
         if (!nodes.containsKey(n)) {
-            throw new UnsupportedOperationException();
+            throw new NoSuchElementException();
+            // throw new UnsupportedOperationException();
         }
         List<String> pred_list = new ArrayList<>();
         for (String node : nodes.keySet()) { // iterate over key of HashMap
-            if (this.hasEdge(node, n)){
+            if (nodes.get(node).contains(n)) {
                 // get corresponding pred lists
                 pred_list.add(node);
             }
@@ -93,27 +101,73 @@ public class ListGraph implements Graph {
     }
 
     public Graph union(Graph g) {
-        Graph u_graph  =new ListGraph();
-        List<String> g_nodes = g.nodes();
-        for(String node: g_nodes){
-            // HERE!!!!
+        for (String node : this.nodes()) {
+            if (!g.hasNode(node)) {
+                // for node in listGraph: if not added, add node
+                g.addNode(node);
+            }
         }
-        throw new UnsupportedOperationException();
+
+        // add edges
+        for (String node : this.nodes()) {
+            for (String succ_node : this.succ(node)) {
+                // for edge from node: if not added, add edge
+                if (!g.hasEdge(node, succ_node)) {
+                    g.addEdge(node, succ_node);
+                }
+            }
+        }
+        return g;
+        // throw new UnsupportedOperationException();
     }
 
     public Graph subGraph(Set<String> nodes) {
-        throw new UnsupportedOperationException();
+        Graph g = new ListGraph();
+        for (String node : nodes) {
+            if (this.nodes.containsKey(node)) {
+                g.addNode(node);
+            }
+        }
+
+        // add edges
+        for (String node : g.nodes()) {
+            for (String succ_node : this.succ(node)) {
+                // for edge from node: if not added, add edge
+                if (!g.hasEdge(node, succ_node)) {
+                    addEdge(node, succ_node);
+                }
+            }
+        }
+        return g;
+        // throw new UnsupportedOperationException();
     }
 
     public boolean connected(String n1, String n2) {
-        // trival
+        // trivial
         if(!nodes.containsKey(n1) || !nodes.containsKey(n2)){
-            throw new UnsupportedOperationException();
+            throw new NoSuchElementException();
         }
-        if (n1==n2){
+        if (n1.equals(n2)){
             return true;
         }
-
-
+        // BFS from n1 to n2
+        List<String> pathList = new LinkedList<>();
+        pathList.add(n1);
+        Iterator<String> it = pathList.iterator();
+        Set<String> path = new HashSet<>(pathList);
+        while(it.hasNext()){
+            String s = it.next();
+            for(String node: this.succ(s)){
+                if (!path.contains(node)){
+                    path.add(node);
+                    pathList.add(node);
+                    if(node.equals(n2)){
+                        return true;
+                    }
+                }
+            }
+        }
+        
+        return false;
     }
 }
