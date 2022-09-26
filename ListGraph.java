@@ -107,23 +107,43 @@ public class ListGraph implements Graph {
     }
 
     public Graph union(Graph g) {
-        for (String node : nodes()) {
-            if (!g.hasNode(node)) {
-                // for node in listGraph: if not added, add node
-                g.addNode(node);
+        Graph u_g = new ListGraph();
+
+        // clone g
+        // add nodes
+        for (String node : g.nodes()) {
+            if (!u_g.hasNode(node)) {
+                u_g.addNode(node);
+            }
+        }
+        // add edges
+        for (String node : g.nodes()) {
+            for (String succ_node : g.succ(node)) {
+                // for edge from node: if not added, add edge
+                if (!u_g.hasEdge(node, succ_node)) {
+                    u_g.addEdge(node, succ_node);
+                }
+            }
+        }
+
+        // add (E, N) for this.nodes
+        for (String node : this.nodes()) {
+            if (!u_g.hasNode(node)) {
+                // for node in ListGraph: if not added, add node
+                u_g.addNode(node);
             }
         }
 
         // add edges
-        for (String node : nodes()) {
+        for (String node : this.nodes()) {
             for (String succ_node : this.succ(node)) {
                 // for edge from node: if not added, add edge
-                if (!g.hasEdge(node, succ_node)) {
-                    g.addEdge(node, succ_node);
+                if (!u_g.hasEdge(node, succ_node)) {
+                    u_g.addEdge(node, succ_node);
                 }
             }
         }
-        return g;
+        return u_g;
         // throw new UnsupportedOperationException();
     }
 

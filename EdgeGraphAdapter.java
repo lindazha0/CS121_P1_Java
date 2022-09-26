@@ -86,22 +86,22 @@ public class EdgeGraphAdapter implements EdgeGraph {
   }
 
   public EdgeGraph union(EdgeGraph g) {
-    for (String n : this.g.nodes()) {
-      for (String node : this.g.succ(n)) {
-        Edge e = new Edge(n, node);
-        if (!g.hasEdge(e)) {
-          g.addEdge(e);
-        }
+    // clone this.g
+    EdgeGraph u_g = new EdgeGraphAdapter(this.g);
+    for (Edge e : g.edges()) {
+      if (!u_g.hasEdge(e)) {
+        u_g.addEdge(e);
       }
     }
-
-    return g;
+    return u_g;
     // throw new UnsupportedOperationException();
   }
 
   public boolean hasPath(List<Edge> e) {
     // trvial
-    if(e.isEmpty()){return true;}
+    if (e.isEmpty()) {
+      return true;
+    }
 
     // iterate the list
     Iterator<Edge> it = e.iterator();
@@ -115,7 +115,7 @@ public class EdgeGraphAdapter implements EdgeGraph {
 
       // if is a path
       curr_e = it.next();
-      if(!curr_e.getSrc().equals(dst)){
+      if (!curr_e.getSrc().equals(dst)) {
         throw new BadPath();
       }
       dst = curr_e.getDst();
