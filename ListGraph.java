@@ -138,9 +138,14 @@ public class ListGraph implements Graph {
         // add edges
         for (String node : g.nodes()) {
             for (String succ_node : this.succ(node)) {
+                // make sure both nodes in g
+                if(!g.hasNode(succ_node)){
+                    continue;
+                }
+                
                 // for edge from node: if not added, add edge
                 if (!g.hasEdge(node, succ_node)) {
-                    addEdge(node, succ_node);
+                    g.addEdge(node, succ_node);
                 }
             }
         }
@@ -156,17 +161,17 @@ public class ListGraph implements Graph {
         if (n1.equals(n2)) {
             return true;
         }
+
         // BFS from n1 to n2
-        List<String> pathList = new LinkedList<>();
-        pathList.add(n1);
-        Iterator<String> it = pathList.iterator();
-        Set<String> path = new HashSet<>(pathList);
-        while (it.hasNext()) {
-            String s = it.next();
+        Queue<String> pathQueue = new LinkedList<String>();
+        pathQueue.add(n1);
+        Set<String> path = new HashSet<>(pathQueue);
+        while (!pathQueue.isEmpty()) {
+            String s = pathQueue.poll();
             for (String node : this.succ(s)) {
                 if (!path.contains(node)) {
                     path.add(node);
-                    pathList.add(node);
+                    pathQueue.add(node);
                     if (node.equals(n2)) {
                         return true;
                     }
